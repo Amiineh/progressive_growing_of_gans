@@ -2,4 +2,7 @@ venv/
 .idea/
 .vs/
 progan.*
+datasets/
+__pycache__/
+example/
 classic_handmade_digikala_labeled.csv

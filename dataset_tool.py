@@ -1,4 +1,4 @@
-# Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
+# Copycrop=None 2018, NVIDIA CORPORATION. All rights reserved.
 #
 # This work is licensed under the Creative Commons Attribution-NonCommercial
 # 4.0 International License. To view a copy of this license, visit
@@ -621,6 +621,50 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
                 img = img.transpose(2, 0, 1) # HWC => CHW
             tfr.add_image(img)
 
+
+# ----------------------------------------------------------------------------
+
+def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolution, labels):
+    print('Loading images from "%s"' % image_dir)
+    if len(labels) == 0:
+        image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
+    else:
+        from carpet_dataset import get_indices
+        indices = get_indices(labels)
+        image_filenames = []
+        for index in indices:
+            image_path = os.path.join(image_dir, index)
+            if os.path.exists(image_path):
+                image_filenames.append(image_path)
+    if len(image_filenames) == 0:
+        error('No input images found')
+
+    img = PIL.Image.open(image_filenames[0]).resize((resolution, resolution))
+    img = np.asarray(img)
+    channels = img.shape[2] if img.ndim == 3 else 1
+    if img.shape[1] != resolution:
+        error('Input images must have the same width and height')
+    if resolution != 2 ** int(np.floor(np.log2(resolution))):
+        error('Input image resolution must be a power-of-two')
+    if channels not in [1, 3]:
+        error('Input images must be stored as RGB or grayscale')
+
+    with TFRecordExporter(tfrecord_dir, len(image_filenames)) as tfr:
+        order = tfr.choose_shuffled_order() if shuffle else np.arange(len(image_filenames))
+        for idx in range(order.size):
+            img = PIL.Image.open(image_filenames[order[idx]]).resize((resolution, resolution))
+            if crop == 4:
+                img = img.crop((0, 0, resolution/2, resolution/2))
+            elif crop == 2:
+                img = img.crop((0, 0, resolution / 2, resolution))
+            img = np.asarray(img)
+            if channels == 1:
+                img = img[np.newaxis, :, :]  # HW => CHW
+            else:
+                img = img.transpose(2, 0, 1)  # HWC => CHW
+            tfr.add_image(img)
+
+
 #----------------------------------------------------------------------------
 
 def create_from_hdf5(tfrecord_dir, hdf5_filename, shuffle):
@@ -717,9 +761,18 @@ def execute_cmdline(argv):
 
     p = add_command(    'create_from_images', 'Create dataset from a directory full of images.',
                                             'create_from_images datasets/mydataset myimagedir')
+    p.add_argument('tfrecord_dir', help='New dataset directory to be created')
+    p.add_argument('image_dir', help='Directory containing the images')
+    p.add_argument('--shuffle', help='Randomize image order (default: 1)', type=int, default=1)
+
+    p = add_command('create_from_images_labeled', 'Create dataset from a directory full of images.',
+                                            'create_from_images_labeled datasets/mydataset myimagedir')
     p.add_argument(     'tfrecord_dir',     help='New dataset directory to be created')
     p.add_argument(     'image_dir',        help='Directory containing the images')
     p.add_argument(     '--shuffle',        help='Randomize image order (default: 1)', type=int, default=1)
+    p.add_argument(     '--crop',           help='Crop image in half (2) or quarter (4) (default: no crop (1))', type=int, default=1)
+    p.add_argument(     '--resolution',     help='Image resolution (default: 1024)', type=int, default=1024)
+    p.add_argument(     '--labels',         help='Image Labels, e.g. 4l 4h 2g (default: [] (all images))', nargs= '+', type=list, default=[])
 
     p = add_command(    'create_from_hdf5', 'Create dataset from legacy HDF5 archive.',
                                             'create_from_hdf5 datasets/celebahq ~/downloads/celeba-hq-1024x1024.h5')
