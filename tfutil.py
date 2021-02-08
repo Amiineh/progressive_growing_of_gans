@@ -12,13 +12,14 @@ import importlib
 import imp
 import numpy as np
 from collections import OrderedDict
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 #----------------------------------------------------------------------------
 # Convenience.
 
 def run(*args, **kwargs): # Run the specified ops in the default session.
-    return tf.get_default_session().run(*args, **kwargs)
+    return tf.compat.v1.get_default_session().run(*args, **kwargs)
 
 def is_tf_expression(x):
     return isinstance(x, tf.Tensor) or isinstance(x, tf.Variable) or isinstance(x, tf.Operation)
@@ -53,7 +54,7 @@ def absolute_name_scope(scope): # Forcefully enter the specified name scope, ign
 # Initialize TensorFlow graph and session using good default settings.
 
 def init_tf(config_dict=dict()):
-    if tf.get_default_session() is None:
+    if tf.compat.v1.get_default_session() is None:
         tf.set_random_seed(np.random.randint(1 << 31))
         create_session(config_dict, force_as_default=True)
 
@@ -62,14 +63,14 @@ def init_tf(config_dict=dict()):
 # {'gpu_options.allow_growth': True}
 
 def create_session(config_dict=dict(), force_as_default=False):
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     for key, value in config_dict.items():
         fields = key.split('.')
         obj = config
         for field in fields[:-1]:
             obj = getattr(obj, field)
         setattr(obj, fields[-1], value)
-    session = tf.Session(config=config)
+    session = tf.compat.v1.Session(config=config)
     if force_as_default:
         session._default_session = session.as_default()
         session._default_session.enforce_nesting = False
@@ -247,7 +248,7 @@ class Optimizer:
     def __init__(
         self,
         name                = 'Train',
-        tf_optimizer        = 'tf.train.AdamOptimizer',
+        tf_optimizer        = 'tf.compat.v1.train.AdamOptimizer', # 'tf.optimizers.Adam', 	# 'tf.train.AdamOptimizer',
         learning_rate       = 0.001,
         use_loss_scaling    = False,
         loss_scaling_init   = 64.0,
