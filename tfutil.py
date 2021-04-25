@@ -12,6 +12,7 @@ import importlib
 import imp
 import numpy as np
 from collections import OrderedDict
+# import tensorflow as tf
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
@@ -19,7 +20,8 @@ tf.disable_v2_behavior()
 # Convenience.
 
 def run(*args, **kwargs): # Run the specified ops in the default session.
-    return tf.compat.v1.get_default_session().run(*args, **kwargs)
+    return tf.Session().run(*args, **kwargs)
+    # return tf.compat.v1.get_default_session().run(*args, **kwargs)
 
 def is_tf_expression(x):
     return isinstance(x, tf.Tensor) or isinstance(x, tf.Variable) or isinstance(x, tf.Operation)
@@ -467,7 +469,8 @@ class Network:
         if self.name is None:
             self.name = self._build_func_name
         self.scope = tf.get_default_graph().unique_name(self.name.replace('/', '_'), mark_as_used=False)
-        
+        # self.scope = tf.get_default_graph().unique_name(self.name.replace('/', '_'), mark_as_used=False)
+
         # Build template graph.
         with tf.variable_scope(self.scope, reuse=tf.AUTO_REUSE):
             assert tf.get_variable_scope().name == self.scope
@@ -630,8 +633,9 @@ class Network:
         out_dtype       = None,     # Convert the output to the specified data type.
         **dynamic_kwargs):          # Additional keyword arguments to pass into the network construction function.
 
-        assert len(in_arrays) == self.num_inputs
+        # assert len(in_arrays) == self.num_inputs
         num_items = in_arrays[0].shape[0]
+        print(num_items)
         if minibatch_size is None:
             minibatch_size = num_items
         key = str([list(sorted(dynamic_kwargs.items())), num_gpus, out_mul, out_add, out_shrink, out_dtype])
@@ -666,7 +670,10 @@ class Network:
                 print('\r%d / %d' % (mb_begin, num_items), end='')
             mb_end = min(mb_begin + minibatch_size, num_items)
             mb_in = [src[mb_begin : mb_end] for src in in_arrays]
-            mb_out = tf.get_default_session().run(out_expr, dict(zip(self.input_templates, mb_in)))
+            # config = tf.compat.v1.ConfigProto(log_device_placement=True, allow_soft_placement=True)
+            print("Num GPUs Available: ", tf.config.list_physical_devices())
+            mb_out = tf.Session().run(out_expr, dict(zip(self.input_templates, mb_in)))
+            # mb_out = tf.get_default_session().run(out_expr, dict(zip(self.input_templates, mb_in)))
             for dst, src in zip(out_arrays, mb_out):
                 dst[mb_begin : mb_end] = src
 
