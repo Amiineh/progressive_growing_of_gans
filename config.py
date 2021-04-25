@@ -50,7 +50,7 @@ sched       = EasyDict()                                    # Options for train.
 grid        = EasyDict(size='1080p', layout='random')       # Options for train.setup_snapshot_image_grid().
 
 # Dataset (choose one).
-desc += '-carpet-4l-64';            dataset = EasyDict(tfrecord_dir='carpet-4l-64'); train.mirror_augment = False 
+desc += '-carpet-4l-256';            dataset = EasyDict(tfrecord_dir='carpet-4l-256'); train.mirror_augment = False 
 #desc += '-carpet-4l';            dataset = EasyDict(tfrecord_dir='carpet-4l'); train.mirror_augment = False
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq'); train.mirror_augment = True
 #desc += '-celeba';              dataset = EasyDict(tfrecord_dir='celeba'); train.mirror_augment = True
