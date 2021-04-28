@@ -625,12 +625,12 @@ def create_from_images(tfrecord_dir, image_dir, shuffle):
 
 # ----------------------------------------------------------------------------
 
-def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolution, labels):
+def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolution, labels, cond=False):
+    from carpet_dataset import get_indices, get_labels
     print('Loading images from "%s"' % image_dir)
     if len(labels) == 0:
         image_filenames = sorted(glob.glob(os.path.join(image_dir, '*')))
     else:
-        from carpet_dataset import get_indices
         indices = get_indices(labels)
         image_filenames = []
         for index in indices:
@@ -664,7 +664,13 @@ def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolutio
             else:
                 img = img.transpose(2, 0, 1)  # HWC => CHW
             tfr.add_image(img)
-
+        if cond:
+            image_labels = np.array(get_labels(image_filenames), dtype=np.int32)
+            assert image_labels.shape == (len(image_filenames),) and image_labels.dtype == np.int32
+            assert np.min(image_labels) == 0 and np.max(image_labels) == 5
+            onehot = np.zeros((image_labels.size, np.max(image_labels) + 1), dtype=np.float32)
+            onehot[np.arange(image_labels.size), image_labels] = 1.0
+            tfr.add_labels(onehot[order])
 
 #----------------------------------------------------------------------------
 
@@ -774,6 +780,7 @@ def execute_cmdline(argv):
     p.add_argument(     '--crop',           help='Crop image in half (2) or quarter (4) (default: no crop (1))', type=int, default=1)
     p.add_argument(     '--resolution',     help='Image resolution (default: 1024)', type=int, default=1024)
     p.add_argument(     '--labels',         help='Image Labels, e.g. 4l 4h 2g (default: [] (all images))', nargs= '+', type=list, default=[])
+    p.add_argument(     '--cond',           help='Conditional training using type2 labels (default: False)', type=bool, default=0)
 
     p = add_command(    'create_from_hdf5', 'Create dataset from legacy HDF5 archive.',
                                             'create_from_hdf5 datasets/celebahq ~/downloads/celeba-hq-1024x1024.h5')

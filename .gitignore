@@ -5,4 +5,5 @@ progan.*
 datasets/
 __pycache__/
 example/
+results/
 classic_handmade_digikala_labeled.csv
