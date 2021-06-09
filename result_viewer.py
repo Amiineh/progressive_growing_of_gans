@@ -30,7 +30,7 @@ def complete_quarter(img, res= None):
     comp.paste(flip, (0, h))
     flip_mirror = ImageOps.mirror(flip)
     comp.paste(flip_mirror, (w, h))
-    comp = comp.resize((w * 3//4, w * 4//4))
+    comp = comp.resize((w * 3, w * 4))
     return comp
 
 
@@ -88,18 +88,17 @@ def make_comp_vid(): # not working now
         video.write(np.array(comp))
 
 
-# make_comp_gif()
 def make_comp_image():
-    for f in glob.glob(result_path + 'fakes012000.png'):
+    for f in glob.glob(result_path + 'fakes011980.png'):
         img = Image.open(f)
         l = img.size[0] // 3
         for col in range(3):
             tmp_img = img
-            tmp_img = tmp_img.crop((col * l, 0, (col + 1) * l, l))
+            tmp_img = tmp_img.crop((col * l, l, (col + 1) * l, l*2))
             tmp_img = complete_quarter(tmp_img)
-            tmp_img.save(result_path + 'comp_fake_' + str(col + 1) + '.png')
+            tmp_img.save(result_path + 'comp_fake_' + str(col + 10) + '.png')
 
-
+make_comp_image()
 def get_nearest_neighbor(k=3):
     # training_set = dataset.load_dataset(data_dir=data_path, verbose=True, **config.dataset)
     data, data_raw = [], []
@@ -133,7 +132,7 @@ def get_nearest_neighbor(k=3):
         # draw.line([k * res, 0, k * res, res], fill=(0, 255, 0), width=5)
         # all.save(os.path.splitext(f)[0] + '_all.jpg')
 
-get_nearest_neighbor()
+
 def interpolate_hypersphere(v1, v2, num_steps):
     v1_norm = tf.norm(v1)
     v2_norm = tf.norm(v2)
