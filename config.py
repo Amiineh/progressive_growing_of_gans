@@ -92,8 +92,8 @@ desc += '-carpet-labeled-64';            dataset = EasyDict(tfrecord_dir='carpet
 #desc += '-lsun-tvmonitor';      dataset = EasyDict(tfrecord_dir='lsun-tvmonitor-100k');      train.mirror_augment = True
 
 # Conditioning & snapshot options.
-#desc += '-cond'; dataset.max_label_size = 'full' # conditioned on full label
-desc += '-cond1'; dataset.max_label_size = 1 # conditioned on first component of the label
+desc += '-cond'; dataset.max_label_size = 'full' # conditioned on full label
+#desc += '-cond1'; dataset.max_label_size = 1 # conditioned on first component of the label
 #desc += '-g4k'; grid.size = '4k'
 #desc += '-grpc'; grid.layout = 'row_per_class'
 
