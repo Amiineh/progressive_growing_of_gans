@@ -1,5 +1,5 @@
 
-import pickle
+import pickle5 as pickle
 import numpy as np
 import tensorflow as tf
 import PIL.Image
@@ -68,5 +68,5 @@ images = images.transpose(0, 2, 3, 1) # NCHW => NHWC
 
 # Save images as PNG.
 for idx in range(images.shape[0]):
-    PIL.Image.fromarray(images[idx], 'RGB').save(result_path + 'img%d.png' % idx)
+    PIL.Image.fromarray(images[idx], 'RGB').save(result_path + 'interp/img%d.png' % idx)
 
