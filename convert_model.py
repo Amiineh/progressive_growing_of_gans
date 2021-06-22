@@ -13,6 +13,5 @@ result_path = "results/001-pgan-carpet-4l-1024-preset-v2-1gpu-fp32/"
 with open(result_path + 'network-final.pkl', 'rb') as file:
     G, D, Gs = pickle.load(file)
 
-tf.io.write_graph(Gs, result_path,
-                     'network_final.pb', as_text=False)
+tf.io.write_graph(Gs, result_path, 'network_final', as_text=False)
 
