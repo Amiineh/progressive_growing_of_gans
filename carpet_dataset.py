@@ -6,7 +6,8 @@ labels_to_int = {'l':0,
                 'k':2,
                 't':3,
                 'g':4,
-                'h':5}
+                'h':5,
+                 '':6}
 
 
 def get_indices(labels):
@@ -29,15 +30,16 @@ def get_labels(indices):
     """
         get label of given indices as dictionary
     """
-    indices = [adrs.split('\\')[-1] for adrs in indices]
-    inx_labels = {}
+    indices = [adrs.split('/')[-1] for adrs in indices]
+#    print(indices)
+ #   inx_labels = {}
     labels = []
     # for index in indices:
     with open(csv_path, 'r') as file:
         csv_reader = csv.reader(file, delimiter=',')
         for row in csv_reader:
             if row[0] in indices:
-                inx_labels[row[0]] = labels_to_int[row[2]]
+  #              inx_labels[row[0]] = labels_to_int[row[2]]
                 labels.append(labels_to_int[row[2]])
         # return inx_labels
         return labels

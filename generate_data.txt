@@ -1,0 +1,1 @@
+ python3 dataset_tool.py create_from_images_labeled datasets/carpet-t-1024 /media/data/amineh/Cropped --crop 1 --resolution 1024 --labels 1t 2t 4t    

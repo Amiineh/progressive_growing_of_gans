@@ -639,6 +639,9 @@ def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolutio
                 image_filenames.append(image_path)
     if len(image_filenames) == 0:
         error('No input images found')
+    if cond:
+        image_labels = np.array(get_labels(image_filenames), dtype=np.int32)
+        print(image_labels)
 
     img = PIL.Image.open(image_filenames[0]).resize((resolution, resolution))
     img = np.asarray(img)
@@ -666,8 +669,9 @@ def create_from_images_labeled(tfrecord_dir, image_dir, shuffle, crop, resolutio
             tfr.add_image(img)
         if cond:
             image_labels = np.array(get_labels(image_filenames), dtype=np.int32)
+            print(image_labels.shape, len(image_filenames), image_labels.dtype)
             assert image_labels.shape == (len(image_filenames),) and image_labels.dtype == np.int32
-            assert np.min(image_labels) == 0 and np.max(image_labels) == 5
+            assert np.min(image_labels) == 0 and np.max(image_labels) == 6
             onehot = np.zeros((image_labels.size, np.max(image_labels) + 1), dtype=np.float32)
             onehot[np.arange(image_labels.size), image_labels] = 1.0
             tfr.add_labels(onehot[order])
