@@ -1,4 +1,4 @@
-# Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
+	# Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
 #
 # This work is licensed under the Creative Commons Attribution-NonCommercial
 # 4.0 International License. To view a copy of this license, visit
@@ -12,7 +12,6 @@ import importlib
 import imp
 import numpy as np
 from collections import OrderedDict
-# import tensorflow as tf
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
@@ -57,7 +56,7 @@ def absolute_name_scope(scope): # Forcefully enter the specified name scope, ign
 
 def init_tf(config_dict=dict()):
     if tf.compat.v1.get_default_session() is None:
-        tf.set_random_seed(np.random.randint(1 << 31))
+        tf.compat.v1.set_random_seed(np.random.randint(1 << 31))
         create_session(config_dict, force_as_default=True)
 
 #----------------------------------------------------------------------------
@@ -66,6 +65,7 @@ def init_tf(config_dict=dict()):
 
 def create_session(config_dict=dict(), force_as_default=False):
     config = tf.compat.v1.ConfigProto()
+    config.gpu_options.allow_growth = True
     for key, value in config_dict.items():
         fields = key.split('.')
         obj = config

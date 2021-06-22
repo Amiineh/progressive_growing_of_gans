@@ -50,7 +50,7 @@ sched       = EasyDict()                                    # Options for train.
 grid        = EasyDict(size='1080p', layout='random')       # Options for train.setup_snapshot_image_grid().
 
 # Dataset (choose one).
-desc += '-carpet-4l-256';            dataset = EasyDict(tfrecord_dir='carpet-4l-256'); train.mirror_augment = False
+desc += '-carpet-labeled-64';            dataset = EasyDict(tfrecord_dir='carpet-labeled-64'); train.mirror_augment = False 
 #desc += '-carpet-4l';            dataset = EasyDict(tfrecord_dir='carpet-4l'); train.mirror_augment = False
 #desc += '-celebahq';            dataset = EasyDict(tfrecord_dir='celebahq'); train.mirror_augment = True
 #desc += '-celeba';              dataset = EasyDict(tfrecord_dir='celeba'); train.mirror_augment = True
@@ -92,7 +92,7 @@ desc += '-carpet-4l-256';            dataset = EasyDict(tfrecord_dir='carpet-4l-
 #desc += '-lsun-tvmonitor';      dataset = EasyDict(tfrecord_dir='lsun-tvmonitor-100k');      train.mirror_augment = True
 
 # Conditioning & snapshot options.
-#desc += '-cond'; dataset.max_label_size = 'full' # conditioned on full label
+desc += '-cond'; dataset.max_label_size = 'full' # conditioned on full label
 #desc += '-cond1'; dataset.max_label_size = 1 # conditioned on first component of the label
 #desc += '-g4k'; grid.size = '4k'
 #desc += '-grpc'; grid.layout = 'row_per_class'
